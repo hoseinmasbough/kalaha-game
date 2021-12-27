@@ -1,15 +1,15 @@
-package com.bol.assignment.game.service;
+package com.bol.assignment.game.common;
 
-import com.bol.assignment.game.common.GameConstant;
-import com.bol.assignment.game.common.MessageConstant;
 import com.bol.assignment.game.core.PlayerType;
 import com.bol.assignment.game.exception.BusinessValidationException;
-import org.springframework.stereotype.Service;
 
-@Service
-public class GameValidation {
+public final class GameValidation {
 
-    public void validateSelectedPit(PlayerType activePlayer, int pitIndex) {
+    private GameValidation(){
+        throw new IllegalStateException(MessageConstant.UTILITY_CLASS.getMessage());
+    }
+
+    public static void validateOnSelectedPit(PlayerType activePlayer, int pitIndex) {
         if (pitIndex < GameConstant.PLAYER_ONE_FIRST_PIT_INDEX.getValue() || pitIndex > GameConstant.RIGHT_BIG_PIT_INDEX.getValue()) {
             throw new BusinessValidationException(String.format(MessageConstant.PIT_INCORRECT_INDEX.getMessage(), pitIndex));
         }

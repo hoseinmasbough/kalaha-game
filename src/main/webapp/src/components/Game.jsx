@@ -18,7 +18,6 @@ function Game() {
         const response = await axios.post(baseURL);
         const data = response.data;
         setGameState(data);
-        //setGameState(initData);
         setLoading(false);
       } catch (error) {
         alert(`Something went wrong, please refresh the page!!`);
@@ -33,7 +32,6 @@ function Game() {
       const response = await axios.post(baseURL);
       const data = response.data;
       setGameState(data);
-      // setGameState(initData);
       setLoading(false);
     } catch (error) {
       alert(`Something went wrong, please refresh the page!!`);
@@ -48,7 +46,6 @@ function Game() {
       const response = await axios.put(url);
       const data = response.data;
       setGameState(data);
-      //setGameState(secondStep);
     } catch (error) {
       openNotification('ERROR:', error.details[0]);
     } finally {
@@ -72,14 +69,23 @@ function Game() {
     notification.open({
       message: title,
       description: msg,
+      duration:2.5,
       icon: <Icon type="smile" style={{ color: '#108ee9' }} />,
     });
   };
 
+  useEffect(() => {
+    if(loading) return;
+    if (gameState.winner) {
+      return showWinner();
+    }
+
+    gameState.reward && openNotification('Congratulation', gameState.reward);
+  
+  }, [loading]);
+
   return (
     <Spin spinning={loading}>
-      {gameState.winner && showWinner()}
-      {gameState.reward && openNotification('Congratulation!', gameState.reward)}
       <Title level={2} style={{ textAlign: 'center' }}>
         Welcome to Kahala Game
       </Title>

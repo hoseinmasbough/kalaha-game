@@ -1,6 +1,7 @@
 package com.bol.assignment.game.service;
 
-import com.bol.assignment.game.common.GameSpecifications;
+import com.bol.assignment.game.common.GameSettings;
+import com.bol.assignment.game.common.GameValidation;
 import com.bol.assignment.game.common.MessageConstant;
 import com.bol.assignment.game.entity.GameStatus;
 import com.bol.assignment.game.exception.ResourceNotFoundException;
@@ -15,37 +16,39 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameManagerService {
 
-    private final GameSpecifications gameSpecifications;
+    private final GameSettings gameSettings;
     private final GameRepository gameRepository;
-    private final GameValidation gameValidation;
 
-    public GameManagerService(GameSpecifications gameSpecifications, GameRepository gameRepository, GameValidation gameValidation) {
-        this.gameSpecifications = gameSpecifications;
+    public GameManagerService(GameSettings gameSettings, GameRepository gameRepository) {
+        this.gameSettings = gameSettings;
         this.gameRepository = gameRepository;
-        this.gameValidation = gameValidation;
     }
 
     public GameStatusOutput createGame() {
-        GameStatus gameStatus = GameHandler.createGame(gameSpecifications.getStones());
+        GameStatus gameStatus = GameHandler.createGame(gameSettings.getStones());
         gameStatus = gameRepository.save(gameStatus);
         return GameStatusMapper.INSTANCE.entityToOutput(gameStatus);
     }
 
     public GameStatusOutput sow(Long gameId, Integer pitId) {
         GameStatus gameStatus = findGameById(gameId);
-        gameValidation.validateSelectedPit(gameStatus.getActivePlayer(), pitId);
+        GameValidation.validateOnSelectedPit(gameStatus.getActivePlayer(), pitId);
 
         GameHandler gameHandler = new GameHandler(gameStatus, pitId);
-        gameHandler.sow();
-        boolean gameShouldBeFinished = gameHandler.isGameFinished();
-        if (gameShouldBeFinished) {
-            gameHandler.finishGame();
-        } else {
-            log.trace("No, let's continue.");
-            gameHandler.checkPlayerTurn();
+        boolean hasMoving = gameHandler.sow();
+
+        if(hasMoving) {
+            boolean gameShouldBeFinished = gameHandler.isGameFinished();
+            if (gameShouldBeFinished) {
+                gameHandler.finishGame();
+            } else {
+                log.trace("No, let's continue.");
+                gameHandler.checkPlayerTurn();
+            }
+
+            gameStatus = gameHandler.getGameStatus();
+            gameRepository.save(gameStatus);
         }
-        gameStatus = gameHandler.getGameStatus();
-        gameRepository.save(gameStatus);
         return GameStatusMapper.INSTANCE.entityToOutput(gameStatus);
     }
 

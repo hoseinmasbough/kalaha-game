@@ -41,19 +41,18 @@ public class GameHandler {
                 .collect(Collectors.toList());
     }
 
-    public void sow() {
+    public boolean sow() {
         cleanReward();
 
         Pit currentSmallPit = getPit(currentPitIndex);
-
         if (currentSmallPit.isEmpty()) {
-            return;
+            return false;
         }
 
         int stones = currentSmallPit.takeStones();
-
         IntStream.rangeClosed(1, stones)
                 .forEach(index -> addStoneToNextPit(index == stones));
+        return true;
     }
 
     public void checkPlayerTurn(){
@@ -140,6 +139,9 @@ public class GameHandler {
         int playerTwoBigPitIndex = PitUtil.getBigPitIndexByPlayer(PlayerType.PLAYER_2);
         Pit playerTwoBigPit = getPit(playerTwoBigPitIndex);
 
+        if(playerOneBigPit.getStones() == playerTwoBigPit.getStones()){
+            return PlayerType.NOBODY;
+        }
         return playerOneBigPit.getStones() > playerTwoBigPit.getStones() ? PlayerType.PLAYER_1 : PlayerType.PLAYER_2;
     }
 

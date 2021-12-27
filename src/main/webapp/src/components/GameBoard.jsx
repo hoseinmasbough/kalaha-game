@@ -8,10 +8,10 @@ function GameBoard({ onMove, onReset, data }) {
   const renderPits = (pits, isActive) => {
     return pits.map((pit) => (
       <Pit
-        label={pit.capacity}
+        label={pit.stones}
         key={pit.index}
         onClick={() => onMove(pit.index)}
-        disabled={!isActive}
+        disabled={!isActive || pit.stones == 0}
       />
     ));
   };
@@ -23,21 +23,21 @@ function GameBoard({ onMove, onReset, data }) {
         <Col xs={24} sm={4}>
           <Player
             name={'PLAYER_1'}
-            score={pits[6].capacity}
-            hasTurn={activePlayer == 'PLAYER_1'}
+            score={pits[6].stones}
+            hasTurn={activePlayer === 'PLAYER_1'}
           />
         </Col>
         <Col span={16} xs={24} sm={16}>
-          <div className="pits-row pits-row-revers">{renderPits(pits.slice(0,6), activePlayer== 'PLAYER_1')}</div>
+          <div className="pits-row pits-row-revers">{renderPits(pits.slice(0,6), activePlayer=== 'PLAYER_1')}</div>
           <div className={`pits-row`}>
-            {renderPits(pits.slice(7,13), activePlayer == 'PLAYER_2')}
+            {renderPits(pits.slice(7,13), activePlayer === 'PLAYER_2')}
           </div>
         </Col>
         <Col span={4} xs={24} sm={4}>
           <Player
             name={'PLAYER_2'}
-            score={pits[13].capacity}
-            hasTurn={activePlayer== 'PLAYER_2'}
+            score={pits[13].stones}
+            hasTurn={activePlayer === 'PLAYER_2'}
           />
         </Col>
       </Row>

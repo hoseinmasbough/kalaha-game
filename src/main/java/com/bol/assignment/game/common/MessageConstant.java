@@ -18,6 +18,7 @@ public enum MessageConstant {
     REWARD_ANOTHER_TURN("You get another turn."),
     SELECT_BIG_PIT("The big pits couldn't be select"),
     SELECT_OPPOSITE_PIT("Player %s couldn't select from the opposite pits"),
+    UTILITY_CLASS("Utility class couldn't is instantiated"),
     REWARD_CAPTURE_OPPOSITE_STONES("You've captured all stones in the opposite pit");
 
     @Getter
