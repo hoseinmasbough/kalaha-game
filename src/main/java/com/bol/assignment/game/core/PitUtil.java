@@ -1,11 +1,12 @@
 package com.bol.assignment.game.core;
 
 import com.bol.assignment.game.common.GameConstant;
+import com.bol.assignment.game.common.MessageConstant;
 
 public class PitUtil {
 
     private PitUtil() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException(MessageConstant.UTILITY_CLASS.getMessage());
     }
 
     public static boolean isPlayerOnOppositeBigPit(int currentPitIndex, PlayerType activePlayer) {

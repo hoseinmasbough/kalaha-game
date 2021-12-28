@@ -60,15 +60,6 @@ public class ExceptionControllerAdvice
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InvalidObjectException.class)
-    public final ResponseEntity<Object> handleInvalidObjectException(InvalidObjectException ex)
-    {
-        List<String> details = new ArrayList<>();
-        details.add(ex.getLocalizedMessage());
-        ErrorMessageOutput error = new ErrorMessageOutput(MessageConstant.INVALID_OBJECT.getMessage(), details);
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(IllegalArgumentException.class)
     public final ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex)
     {

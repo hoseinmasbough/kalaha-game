@@ -11,7 +11,7 @@ function GameBoard({ onMove, onReset, data }) {
         label={pit.stones}
         key={pit.index}
         onClick={() => onMove(pit.index)}
-        disabled={!isActive || pit.stones == 0}
+        disabled={!isActive || pit.stones === 0}
       />
     ));
   };

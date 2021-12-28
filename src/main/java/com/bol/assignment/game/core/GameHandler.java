@@ -22,10 +22,17 @@ public class GameHandler {
         this.currentPitIndex = currentPitIndex;
     }
 
+    /**
+     * Create a new game.
+     *
+     * @param stonesCount Count of stones in any small pits. It should be more than one
+     * @return Return a {@link GameStatus} that always reflect the latest status of the game
+     */
     public static GameStatus createGame(int stonesCount) {
         GameStatus gameStatus = new GameStatus();
         gameStatus.setActivePlayer(PlayerType.PLAYER_1);
         gameStatus.setPits(initializePits(gameStatus, stonesCount));
+        log.debug("initializing a new game with {} stones and {} pits", stonesCount, GameConstant.ALL_PITS.getValue());
         return gameStatus;
     }
 
@@ -41,11 +48,17 @@ public class GameHandler {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * It picks up all the stones in specified pit and sows the stones on to the right.
+     *
+     * @return If the specified pit has no stone it doesn't do any sowing and return false, otherwise true
+     */
     public boolean sow() {
         cleanReward();
 
         Pit currentSmallPit = getPit(currentPitIndex);
         if (currentSmallPit.isEmpty()) {
+            log.info("pit {} is empty so it couldn't have any sow", currentPitIndex);
             return false;
         }
 
@@ -55,7 +68,10 @@ public class GameHandler {
         return true;
     }
 
-    public void checkPlayerTurn(){
+    /**
+     * It changes the player turn, If the last pit is not a big pit
+     */
+    public void checkPlayerTurn() {
         if (PitUtil.isBigPit(currentPitIndex)) {
             gameStatus.setReward(MessageConstant.REWARD_ANOTHER_TURN.getMessage());
         } else {
@@ -85,6 +101,7 @@ public class GameHandler {
             if (targetPit.isEmpty() && !oppositeSmallPit.isEmpty()) {
                 log.info("last pit {} is empty and opposite pit {} isn't empty, so capturing all opposite's stones.", targetPit.getIndex(), oppositeSmallPit.getIndex());
                 int oppositeStones = oppositeSmallPit.takeStones();
+                // +1 for the last stone
                 oppositeStones += 1;
                 addStonesToActivePlayerBigPit(oppositeStones);
                 return;
@@ -99,7 +116,7 @@ public class GameHandler {
         if (currentPitIndex == GameConstant.ALL_PITS.getValue()) {
             currentPitIndex = 0;
         }
-        log.debug("go to next pit. pitIndex:{}", currentPitIndex);
+        log.debug("go to the next pit. pitIndex:{}", currentPitIndex);
     }
 
     private Pit getOppositePit(int pitIndex) {
@@ -107,20 +124,27 @@ public class GameHandler {
         return getPit(oppositeIndex);
     }
 
+    /**
+     * Review the finishing conditions of game
+     * @return If game has status of finishing it returns true, otherwise false
+     */
     public boolean isGameFinished() {
         List<Pit> playerOnePits = getAllSmallPitsByPlayerType(PlayerType.PLAYER_1);
         List<Pit> playerTwoPits = getAllSmallPitsByPlayerType(PlayerType.PLAYER_2);
 
         playerOneRemainingStones = getRemainingStones(playerOnePits);
         playerTwoRemainingStones = getRemainingStones(playerTwoPits);
-        log.debug("does game have finishing condition? p1RemainingStones:{}, p2RemainingStones:{}",
+        log.debug("Does game have finishing condition? p1RemainingStones:{}, p2RemainingStones:{}",
                 playerOneRemainingStones, playerTwoRemainingStones);
 
         return playerOneRemainingStones == 0 || playerTwoRemainingStones == 0;
     }
 
+    /**
+     * It reviews of stones count of both players and determine the winner or maybe game is draw
+     */
     public void finishGame() {
-        log.info("The game should be finished");
+        log.debug("Game finishing is started");
         if (playerOneRemainingStones > 0) {
             putRemainingStonesToBigPit(PlayerType.PLAYER_1);
         } else if (playerTwoRemainingStones > 0) {
@@ -128,7 +152,7 @@ public class GameHandler {
         }
 
         PlayerType winner = determineWinner();
-        log.info("And FINALLY, Our WINNER is {}", winner);
+        log.info("Game is finished and winner is {}", winner);
         gameStatus.setWinner(winner);
     }
 
@@ -138,8 +162,9 @@ public class GameHandler {
 
         int playerTwoBigPitIndex = PitUtil.getBigPitIndexByPlayer(PlayerType.PLAYER_2);
         Pit playerTwoBigPit = getPit(playerTwoBigPitIndex);
-
-        if(playerOneBigPit.getStones() == playerTwoBigPit.getStones()){
+        log.info("player one has {} stones and player two has {}", playerOneBigPit.getStones(),
+                playerTwoBigPit.getStones());
+        if (playerOneBigPit.getStones() == playerTwoBigPit.getStones()) {
             return PlayerType.NOBODY;
         }
         return playerOneBigPit.getStones() > playerTwoBigPit.getStones() ? PlayerType.PLAYER_1 : PlayerType.PLAYER_2;
@@ -152,7 +177,6 @@ public class GameHandler {
         int bigPitIndex = PitUtil.getBigPitIndexByPlayer(playerType);
         Pit bigPit = getPit(bigPitIndex);
         bigPit.addStones(collectedStones);
-        log.info("big pit of {} has {} stones", playerType, bigPit.getStones());
     }
 
     private int getRemainingStones(List<Pit> pits) {
@@ -185,6 +209,7 @@ public class GameHandler {
         } else {
             this.gameStatus.setActivePlayer(PlayerType.PLAYER_1);
         }
+        log.debug("next player is {}", this.gameStatus.getActivePlayer());
     }
 
     private List<Pit> getAllSmallPitsByPlayerType(PlayerType playerType) {

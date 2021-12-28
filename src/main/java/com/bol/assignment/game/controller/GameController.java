@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/kalaha")
-@CrossOrigin
+//@CrossOrigin
 @Api(value = "Kalaha Game API. Set of endpoints for Creating, Sowing and Checking status of the Game",
         tags = {"kalaha"})
 public class GameController {
@@ -23,7 +23,7 @@ public class GameController {
     }
 
     @PostMapping
-    @ApiOperation(value = "Creating a new Kalaha game instance. It returns a GameStatus object with unique gameId used for playing the game",
+    @ApiOperation(value = "Creating a new Kalaha game instance. It returns a GameStatus object with unique gameId that is used for playing the game",
             tags = {"kalaha"}, produces = "Application/JSON", httpMethod = "POST")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Game created", response = GameStatusOutput.class)})
@@ -43,7 +43,7 @@ public class GameController {
             @ApiResponse(code = 405, message = "Validation exception")})
     public ResponseEntity<GameStatusOutput> sow(
             @ApiParam(name = "gameId",
-                    value = "The id of game created by calling createGame() method. Cannot be empty",
+                    value = "The gameId is created by calling createGame() method. Cannot be empty",
                     required = true,
                     example = "1")
             @PathVariable(value = "gameId") Long gameId,
@@ -52,23 +52,24 @@ public class GameController {
                     required = true,
                     example = "0")
             @PathVariable(value = "pitId") Integer pitId) {
-        log.info("sow is called. GameId:{}, pit Index:{}", gameId, pitId);
+        log.info("sow is called. gameId:{}, pitIndex:{}", gameId, pitId);
         GameStatusOutput gameStatusOutput = gameManagerService.sow(gameId, pitId);
         return new ResponseEntity<>(gameStatusOutput, HttpStatus.OK);
     }
 
     @GetMapping("{gameId}")
-    @ApiOperation(value = "Get gameStatus by gameId", notes = "Returns the latest status of the specified game",
+    @ApiOperation(value = "Get gameStatus by gameId", notes = "Returns the latest status of the specified game by id",
             tags = {"kalaha"}, httpMethod = "GET", produces = "Application/JSON")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful operation", response = GameStatusOutput.class),
             @ApiResponse(code = 404, message = "Game not found")})
-    public ResponseEntity<GameStatusOutput> findGameById(
+    public ResponseEntity<GameStatusOutput> loadGame(
             @ApiParam(name = "gameId",
                     value = "The id of game created by calling createGame() method. Cannot be empty",
                     required = true,
                     example = "1")
             @PathVariable(value = "gameId") Long gameId) {
+        log.debug("findGameById is called. gameId:{}", gameId);
         return ResponseEntity.ok(gameManagerService.loadGame(gameId));
     }
 }

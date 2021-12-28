@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Typography, notification, Icon, Modal, Spin } from 'antd';
 import axios from 'axios';
 import GameBoard from './GameBoard';
-import { initData, secondStep } from '../fake';
 
 const { Title } = Typography;
 
@@ -55,10 +54,10 @@ function Game() {
 
   const showWinner = () => {
     Modal.info({
-      title: 'Game Result:',
+      title: 'Game Result',
       content: (
         <div>
-          <p>Winner is: {gameState.winner}</p>
+          <p>Game is Finished. Winner is: {gameState.winner}</p>
         </div>
       ),
       onOk: handleReset,
