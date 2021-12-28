@@ -195,7 +195,7 @@ public class GameHandler {
         log.info("add {} stones to big pit {}", stones, bigPitIndex);
         Pit bigPit = getPit(bigPitIndex);
         bigPit.addStones(stones);
-        log.info("big pit {} has {} stones", bigPitIndex, stones);
+        log.info("big pit {} has {} stones", bigPitIndex, bigPit.getStones());
         gameStatus.setReward(MessageConstant.REWARD_CAPTURE_OPPOSITE_STONES.getMessage());
     }
 

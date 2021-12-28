@@ -3,7 +3,7 @@ package com.bol.assignment.game.core;
 import com.bol.assignment.game.common.GameConstant;
 import com.bol.assignment.game.common.MessageConstant;
 
-public class PitUtil {
+public final class PitUtil {
 
     private PitUtil() {
         throw new IllegalStateException(MessageConstant.UTILITY_CLASS.getMessage());

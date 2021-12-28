@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/kalaha")
-//@CrossOrigin
+@RequestMapping("/api/kalaha")
 @Api(value = "Kalaha Game API. Set of endpoints for Creating, Sowing and Checking status of the Game",
         tags = {"kalaha"})
 public class GameController {

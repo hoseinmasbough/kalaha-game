@@ -1,8 +1,8 @@
 # Seyyed Hossein Masbough - KALAHA GAME
 
 
-## Running game 
-Use the following instructions for building and running game:
+## Building Game 
+Use the following instructions for building and running the game:
 
 ```
 cd project_dir
@@ -11,6 +11,15 @@ cd target
 java -jar kalaha-game-0.1.jar
 
 ```
+
+***
+## Game Page Address
+- [ ] [Game URL](http://localhost:8080/)
+
+***
+## Rest API Doc
+
+- [ ] [Swagger URL](http://localhost:8080/swagger-ui/index.html)
 
 ***
 ## Improvable Notes
@@ -48,8 +57,5 @@ Estimation: 1w
 
 5- Centralized configuration
 - Apache Zookeeper
-***
 
-## Rest API Doc
-
-- [ ] [Swagger URL](http://localhost:8080/api/swagger-ui/index.html)
+Estimation: 2d
