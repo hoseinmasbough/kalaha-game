@@ -75,7 +75,76 @@ class GameManagerServiceTest {
 
     @Test
     @Order(2)
-    void should_return_updated_valid_gameStatusOutput_when_sow_firstPit() {
+    void should_return_same_gameStatus_when_choose_emptyPit() {
+        //Mock
+        GameStatus gameStatus = TestUtil.createGameStatusForCaptureAllReward();
+        Mockito.when(gameRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(gameStatus));
+        GameStatusOutput oldGameStatus = GameStatusMapper.INSTANCE.entityToOutput(gameStatus);
+
+        //Operation
+        GameStatusOutput newGameStatus = gameManagerService.sow(gameId, 2);
+
+        //Assertion
+        assertNotNull(newGameStatus, "gameStatus is not null");
+        assertEquals(oldGameStatus, newGameStatus, "new and old should be same");
+    }
+
+    @Test
+    @Order(2)
+    void should_return_businessValidationException_when_choose_notExistedPit() {
+        //Mock
+        GameStatus gameStatus = TestUtil.createGameStatusForCaptureAllReward();
+        Mockito.when(gameRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(gameStatus));
+
+        //Operation
+        int wrongPitIndex = GameConstant.RIGHT_BIG_PIT_INDEX.getValue() + 10;
+        BusinessValidationException thrown = Assertions.assertThrows(BusinessValidationException.class,
+                () -> gameManagerService.sow(gameId, wrongPitIndex),
+                "Because of selecting a wrong pit index a BusinessValidationException was expected");
+
+        //Assertion
+        Assertions.assertEquals(String.format(MessageConstant.PIT_INCORRECT_INDEX.getMessage(), wrongPitIndex),
+                thrown.getMessage());
+    }
+
+    @Test
+    @Order(2)
+    void should_return_businessValidationException_when_choose_bigPit() {
+        //Mock
+        int bigPitIndex = GameConstant.RIGHT_BIG_PIT_INDEX.getValue();
+        GameStatus gameStatus = TestUtil.createGameStatusForCaptureAllReward();
+        Mockito.when(gameRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(gameStatus));
+
+        //Operation
+        BusinessValidationException thrown = Assertions.assertThrows(BusinessValidationException.class,
+                () -> gameManagerService.sow(gameId, bigPitIndex),
+                "Because of selecting a big pit index a BusinessValidationException was expected");
+
+        //Assertion
+        Assertions.assertEquals(MessageConstant.SELECT_BIG_PIT.getMessage(), thrown.getMessage());
+    }
+
+    @Test
+    @Order(2)
+    void should_return_businessValidationException_when_choose_oppositePit() {
+        //Mock
+        GameStatus gameStatus = TestUtil.createGameStatusForCaptureAllReward();
+        Mockito.when(gameRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(gameStatus));
+
+        //Operation
+        int playerTwoPitIndex = GameConstant.PLAYER_TWO_FIRST_PIT_INDEX.getValue();
+        BusinessValidationException thrown = Assertions.assertThrows(BusinessValidationException.class,
+                () -> gameManagerService.sow(gameId, playerTwoPitIndex),
+                "Because of selecting an opposite pit index a BusinessValidationException was expected");
+
+        //Assertion
+        Assertions.assertEquals(String.format(MessageConstant.SELECT_OPPOSITE_PIT.getMessage(), 1),
+                thrown.getMessage());
+    }
+
+    @Test
+    @Order(2)
+    void should_return_gameStatusOutput_with_anotherTurnReward_when_choose_firstPit_at_beginOfGame() {
         //Mock
         Mockito.when(gameRepository.save(ArgumentMatchers.any(GameStatus.class))).
                 then(AdditionalAnswers.returnsFirstArg());
@@ -89,8 +158,7 @@ class GameManagerServiceTest {
         //Assertion
         assertNotNull(gameStatusOutput, "gameStatusOutput should not be null");
         assertEquals(gameId, gameStatusOutput.getId(), "returned gameId is equal to passed gameId");
-        assertEquals(gameStatusOutput.getActivePlayer(),
-                PlayerType.PLAYER_1.name(),
+        assertEquals(gameStatusOutput.getActivePlayer(), PlayerType.PLAYER_1.name(),
                 "the first player is active player again");
         assertEquals(MessageConstant.REWARD_ANOTHER_TURN.getMessage(),
                 gameStatusOutput.getReward(), "the firstPlayer has a reward");
@@ -122,76 +190,7 @@ class GameManagerServiceTest {
 
     @Test
     @Order(2)
-    void should_return_same_gameStatus_when_sow_emptyPit() {
-        //Mock
-        GameStatus gameStatus = TestUtil.createGameStatusForCaptureAllReward();
-        Mockito.when(gameRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(gameStatus));
-        GameStatusOutput oldGameStatus = GameStatusMapper.INSTANCE.entityToOutput(gameStatus);
-
-        //Operation
-        GameStatusOutput newGameStatus = gameManagerService.sow(gameId, 2);
-
-        //Assertion
-        assertNotNull(newGameStatus, "gameStatus is not null");
-        assertEquals(oldGameStatus, newGameStatus, "new and old should be same");
-    }
-
-    @Test
-    @Order(2)
-    void should_return_businessValidationException_when_sow_emptyPit() {
-        //Mock
-        GameStatus gameStatus = TestUtil.createGameStatusForCaptureAllReward();
-        Mockito.when(gameRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(gameStatus));
-
-        //Operation
-        int wrongPitIndex = GameConstant.RIGHT_BIG_PIT_INDEX.getValue() + 10;
-        BusinessValidationException thrown = Assertions.assertThrows(BusinessValidationException.class,
-                () -> gameManagerService.sow(gameId, wrongPitIndex),
-                "Because of selecting a wrong pit index a BusinessValidationException was expected");
-
-        //Assertion
-        Assertions.assertEquals(String.format(MessageConstant.PIT_INCORRECT_INDEX.getMessage(), wrongPitIndex),
-                thrown.getMessage());
-    }
-
-    @Test
-    @Order(2)
-    void should_return_businessValidationException_when_sow_bigPit() {
-        //Mock
-        int bigPitIndex = GameConstant.RIGHT_BIG_PIT_INDEX.getValue();
-        GameStatus gameStatus = TestUtil.createGameStatusForCaptureAllReward();
-        Mockito.when(gameRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(gameStatus));
-
-        //Operation
-        BusinessValidationException thrown = Assertions.assertThrows(BusinessValidationException.class,
-                () -> gameManagerService.sow(gameId, bigPitIndex),
-                "Because of selecting a big pit index a BusinessValidationException was expected");
-
-        //Assertion
-        Assertions.assertEquals(MessageConstant.SELECT_BIG_PIT.getMessage(), thrown.getMessage());
-    }
-
-    @Test
-    @Order(2)
-    void should_return_businessValidationException_when_sow_oppositePit() {
-        //Mock
-        GameStatus gameStatus = TestUtil.createGameStatusForCaptureAllReward();
-        Mockito.when(gameRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(gameStatus));
-
-        //Operation
-        int playerTwoPitIndex = GameConstant.PLAYER_TWO_FIRST_PIT_INDEX.getValue();
-        BusinessValidationException thrown = Assertions.assertThrows(BusinessValidationException.class,
-                () -> gameManagerService.sow(gameId, playerTwoPitIndex),
-                "Because of selecting an opposite pit index a BusinessValidationException was expected");
-
-        //Assertion
-        Assertions.assertEquals(String.format(MessageConstant.SELECT_OPPOSITE_PIT.getMessage(), 1),
-                thrown.getMessage());
-    }
-
-    @Test
-    @Order(2)
-    void should_return_gameStatusOutput_with_captureAllReward_when_sow_and_lastPitIsEmpty() {
+    void should_return_gameStatusOutput_with_captureAllReward_when_lastPitIsEmpty() {
         //Mock
         Mockito.when(gameRepository.save(ArgumentMatchers.any(GameStatus.class))).
                 then(AdditionalAnswers.returnsFirstArg());

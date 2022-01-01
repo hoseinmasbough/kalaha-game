@@ -23,16 +23,16 @@ java -jar kalaha-game-0.1.jar
 
 ***
 ## Improvable Notes
-
+Some features that could be added
 
 1- Security
-- Adding JWT security utils file
+- Adding JWT security util files
 - Changing controller for handling jwt requests
 
 Estimation: 2d
 
 2- Docker
-- creating 2 seperated dockers for front-app and back-app
+- creating 2 seperated dockers for front-end and back-end apps
 - managing apps in a docker-compose
 
 Estimation: 1d
