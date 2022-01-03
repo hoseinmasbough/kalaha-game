@@ -35,9 +35,10 @@ public class GameManagerService {
         GameValidation.validateOnSelectedPit(gameStatus.getActivePlayer(), pitId);
 
         GameHandler gameHandler = new GameHandler(gameStatus, pitId);
-        boolean hasMoving = gameHandler.sow();
+        boolean hasSowing = gameHandler.sow();
 
-        if(hasMoving) {
+        if (hasSowing) {
+            gameHandler.checkLastSownPitForCapturing();
             boolean gameShouldBeFinished = gameHandler.isGameFinished();
             if (gameShouldBeFinished) {
                 gameHandler.finishGame();
@@ -57,7 +58,7 @@ public class GameManagerService {
         return GameStatusMapper.INSTANCE.entityToOutput(gameStatus);
     }
 
-    private GameStatus findGameById(Long id){
+    private GameStatus findGameById(Long id) {
         return gameRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(

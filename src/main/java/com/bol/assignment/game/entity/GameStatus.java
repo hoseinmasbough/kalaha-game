@@ -20,8 +20,7 @@ public class GameStatus {
     private PlayerType activePlayer;
     @OneToMany(
             mappedBy = "gameStatus",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+            cascade = CascadeType.ALL
     )
     private List<Pit> pits = new ArrayList<>();
     @Transient

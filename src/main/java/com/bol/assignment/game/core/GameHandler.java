@@ -54,8 +54,6 @@ public class GameHandler {
      * @return If the specified pit has no stone it doesn't do any sowing and return false, otherwise true
      */
     public boolean sow() {
-        cleanReward();
-
         Pit currentSmallPit = getPit(currentPitIndex);
         if (currentSmallPit.isEmpty()) {
             log.info("pit {} is empty so it couldn't have any sow", currentPitIndex);
@@ -64,7 +62,7 @@ public class GameHandler {
 
         int stones = currentSmallPit.takeStones();
         IntStream.rangeClosed(1, stones)
-                .forEach(index -> addStoneToNextPit(index == stones));
+                .forEach(index -> addStoneToNextPit());
         return true;
     }
 
@@ -79,7 +77,7 @@ public class GameHandler {
         }
     }
 
-    private void addStoneToNextPit(boolean lastStone) {
+    private void addStoneToNextPit() {
         goToNextPit();
         if (PitUtil.isPlayerOnOppositeBigPit(currentPitIndex, gameStatus.getActivePlayer())) {
             log.debug("Current pit is an opposite big pit. Skip it. pitIndex:{}", currentPitIndex);
@@ -87,28 +85,38 @@ public class GameHandler {
         }
 
         Pit targetPit = getPit(currentPitIndex);
-
-        if (!lastStone || PitUtil.isBigPit(currentPitIndex)) {
-            targetPit.sow();
-            log.info("pit {} has {} stones.", currentPitIndex, targetPit.getStones());
-            return;
-        }
-
-        boolean isLastPitForActivePlayer = PitUtil.isPitForActivePlayer(currentPitIndex, gameStatus.getActivePlayer());
-        if (isLastPitForActivePlayer) {
-            log.info("last pit {} is my own.", currentPitIndex);
-            Pit oppositeSmallPit = getOppositePit(currentPitIndex);
-            if (targetPit.isEmpty() && !oppositeSmallPit.isEmpty()) {
-                log.info("last pit {} is empty and opposite pit {} isn't empty, so capturing all opposite's stones.", targetPit.getIndex(), oppositeSmallPit.getIndex());
-                int oppositeStones = oppositeSmallPit.takeStones();
-                // +1 for the last stone
-                oppositeStones += 1;
-                addStonesToActivePlayerBigPit(oppositeStones);
-                return;
-            }
-        }
         targetPit.sow();
         log.info("pit {} has {} stones.", currentPitIndex, targetPit.getStones());
+    }
+
+    /**
+     * Checking if there are conditions of capturing all stones of the opposite pit then to takes them and adding to big pit.
+     */
+    public void checkLastSownPitForCapturing() {
+        // todo: There are a lot of if-condition statements in this method. It could be simpler and refactored by some best practices like RuleEngine
+        // https://www.baeldung.com/java-replace-if-statements
+        if (PitUtil.isBigPit(currentPitIndex)) {
+            return;
+        }
+        boolean isLastPitForActivePlayer = PitUtil.isPitForActivePlayer(currentPitIndex, gameStatus.getActivePlayer());
+        if (!isLastPitForActivePlayer) {
+            return;
+        }
+        log.info("Owner of last pit {} is activePlayer.", currentPitIndex);
+        Pit lastPit = getPit(currentPitIndex);
+        // It means it had no stone before sowing
+        if (lastPit.getStones() > 1) {
+            return;
+        }
+        Pit oppositePit = getOppositePit(currentPitIndex);
+        if (oppositePit.isEmpty()) {
+            return;
+        }
+        log.info("last pit {} is empty and opposite pit {} isn't empty, so capturing all opposite's stones.", lastPit.getIndex(), oppositePit.getIndex());
+        int oppositeStones = oppositePit.takeStones();
+        int lastPitStones = lastPit.takeStones();
+        oppositeStones += lastPitStones;
+        addStonesToActivePlayerBigPit(oppositeStones);
     }
 
     private void goToNextPit() {
@@ -126,6 +134,7 @@ public class GameHandler {
 
     /**
      * Review the finishing conditions of game
+     *
      * @return If game has status of finishing it returns true, otherwise false
      */
     public boolean isGameFinished() {
@@ -215,10 +224,6 @@ public class GameHandler {
     private List<Pit> getAllSmallPitsByPlayerType(PlayerType playerType) {
         return playerType == PlayerType.PLAYER_1 ? this.gameStatus.getPits().subList(GameConstant.PLAYER_ONE_FIRST_PIT_INDEX.getValue(), GameConstant.LEFT_BIG_PIT_INDEX.getValue()) :
                 this.gameStatus.getPits().subList(GameConstant.PLAYER_TWO_FIRST_PIT_INDEX.getValue(), GameConstant.RIGHT_BIG_PIT_INDEX.getValue());
-    }
-
-    private void cleanReward() {
-        gameStatus.setReward(null);
     }
 
     public GameStatus getGameStatus() {

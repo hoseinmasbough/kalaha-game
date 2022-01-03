@@ -40,7 +40,7 @@ public class GameController {
             @ApiResponse(code = 400, message = "Invalid ID supplied"),
             @ApiResponse(code = 404, message = "Game not found"),
             @ApiResponse(code = 405, message = "Validation exception")})
-    public ResponseEntity<GameStatusOutput> sow(
+    public ResponseEntity<GameStatusOutput> selectPit(
             @ApiParam(name = "gameId",
                     value = "The gameId is created by calling createGame() method. Cannot be empty",
                     required = true,
