@@ -29,20 +29,14 @@ Some features that could be added
 - Adding JWT security util files
 - Changing controller for handling jwt requests
 
-Estimation: 2d
-
 2- Docker
 - creating 2 seperated dockers for front-end and back-end apps
 - managing apps in a docker-compose
-
-Estimation: 1d
 
 3- Persistent DB
 - Make a decision about sql/nosql
 - Adding required libraries
 - Changing current entities if it needed
-
-Estimation: 3d
 
 4- Microservice
 - Spring Cloud
@@ -53,9 +47,5 @@ Estimation: 3d
 - Hystrix (Circuit Breakers)
 - Zuul
 
-Estimation: 1w
-
 5- Centralized configuration
 - Apache Zookeeper
-
-Estimation: 2d
